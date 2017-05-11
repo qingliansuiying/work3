@@ -1,6 +1,7 @@
 #include<iostream>
 #include<ctime>
 #include<stdlib.h>
+#include "head.h"
 using namespace std;
 int flag=0;        //flag用于检测生成式子是否符合要求
 float num[5]; 
@@ -8,27 +9,42 @@ char sig[4];
 
 int scan1()            //初始界面，此部分将来打算添加语言切换 
 {
-	int sum;
 	cout<<"Welcome!"<<endl;
 	cout<<"请输入你想要的题目数量："<<endl;
-	cin>>sum;
-	return sum; 
 }
 
-int scan2(int correct)        //用于读入用户输入的答案，并进行判断 
+
+int readFile(char *fp)      //读取用户要求的题目数量
 {
+	int sum;
+	ifstream icin;
+	icin.open(fp);
+	icin >> sum;    //将文件中的数据读到sum中
+	return sum;
+}
+
+int scan2(char *fp,int correct)        //用于读入用户输入的答案，并进行判断 
+{
+	ofstream ocout;
+	ocout.open(fp, ios::app);
 	int answer;
 	cin>>answer;
+	ocout << answer;                   //将用户输入的答案和判断结果存入文档
 	if(answer==correct)
 	{
 		cout<<"答案正确！"<<endl;
+		ocout << "答案正确！" << endl;
+		ocout.close();
 		return 1;
 	}
 	else
 	{
 		cout<<"答案错误！正确答案是："<<correct<<endl;
+		ocout << "答案错误！正确答案是：" << correct << endl;
+		ocout.close();
 		return 0;
 	}
+	
 } 
 
 void randomNumber()          //生成随机数
@@ -393,15 +409,21 @@ int calculateResult(int type)      //计算生成的随机式子的结果
 
 void print(int rig,int wro)                //输出统计结果
 { 
-	cout<<"正确题数："<<rig<<endl;
+	ofstream ocout;
+	ocout.open(fp, ios::app);
+	ocout<<"正确题数："<<rig<<endl;
+	cout << "正确题数：" << rig << endl;
 	cout<<"错误题数："<<wro<<endl;
+	ocout << "正确题数：" << rig << endl;
+	ocout.close();
 }
 
-int main()           //主函数
+int main(int argc, char *argv[])          //主函数
 {	
 	srand(time(0));
 	int i,type,sum=0,correct=0,rig=0,wro=0;  //type用于控制式子输出类型，correct存储式子正确答案，rig，wro统计正误题数 
-	sum=scan1();
+	scan1();
+	sum = readFile(argv[1]);   
 	for(i=1;i<=sum;)
 	{
 		randomNumber();
@@ -412,7 +434,7 @@ int main()           //主函数
 		{
 		
 			generateExpression(type);
-			if(scan2(correct)==1)
+			if(scan2(argv[2],correct)==1)
 			{
 				rig++;
 			}
@@ -428,7 +450,7 @@ int main()           //主函数
 		}
 		i++;
 	}
-	print(rig,wro);
+	print(argv[2],rig,wro);
 	return 0;
 }
 
