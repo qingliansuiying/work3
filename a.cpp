@@ -1,11 +1,10 @@
 #include<iostream>
 #include<ctime>
+#include <fstream>
+#include<string>
 #include<stdlib.h>
 #include "head.h"
 using namespace std;
-int flag=0;        //flag用于检测生成式子是否符合要求
-float num[5]; 
-char sig[4]; 
 
 int scan1()            //初始界面，此部分将来打算添加语言切换 
 {
@@ -14,12 +13,16 @@ int scan1()            //初始界面，此部分将来打算添加语言切换
 }
 
 
-int readFile(char *fp)      //读取用户要求的题目数量
+int readFile(char *fp,char *fp2)      //读取用户要求的题目数量
 {
+	ofstream ocout;
+	ocout.open(fp2, ios::app);
 	int sum;
 	ifstream icin;
 	icin.open(fp);
-	icin >> sum;    //将文件中的数据读到sum中
+	icin>>sum;    //将文件中的数据读到sum中
+	ocout<<"用户所需的总题数： "<<sum<<endl;
+	ocout.close();
 	return sum;
 }
 
@@ -29,7 +32,7 @@ int scan2(char *fp,int correct)        //用于读入用户输入的答案，并进行判断
 	ocout.open(fp, ios::app);
 	int answer;
 	cin>>answer;
-	ocout << answer;                   //将用户输入的答案和判断结果存入文档
+	ocout << answer <<endl;                   //将用户输入的答案和判断结果存入文档
 	if(answer==correct)
 	{
 		cout<<"答案正确！"<<endl;
@@ -137,17 +140,49 @@ float jisuan(float num1,char sign1,float num2,char sign2,float num3)    //得出三
 	return result;
 }
 
-void generateExpression(int type)     //输出随机式子
+void generateExpression(char *fp,int type)     //输出随机式子
 {
+	ofstream ocout;
+	ocout.open(fp, ios::app);
     switch(type)                     //用一个随机数控制输出随机式子，与calculateResult() 配套使用
 	{
-		case 0:cout<<num[1]<<sig[1]<<num[2]<<sig[2]<<num[3]<<sig[3]<<num[4]<<'=';break;					//1+2+3+4=
-		case 1:cout<<'('<<num[1]<<sig[1]<<num[2]<<')'<<sig[2]<<num[3]<<sig[3]<<num[4]<<'=';break;		//(1+2)+3+4=
-		case 2:cout<<num[1]<<sig[1]<<num[2]<<sig[2]<<'('<<num[3]<<sig[3]<<num[4]<<')'<<'=';break;		//1+2+(3+4)=
-		case 3:cout<<num[1]<<sig[1]<<'('<<num[2]<<sig[2]<<num[3]<<')'<<sig[3]<<num[4]<<'=';break;		//1+(2+3)+4=
-		case 4:cout<<'('<<num[1]<<sig[1]<<num[2]<<sig[2]<<num[3]<<')'<<sig[3]<<num[4]<<'=';break;		//(1+2+3)+4=
-		case 5:cout<<num[1]<<sig[1]<<'('<<num[2]<<sig[2]<<num[3]<<sig[3]<<num[4]<<')'<<'=';break;		//1+(2+3+4)=
+		case 0:
+		{
+			cout<<num[1]<<sig[1]<<num[2]<<sig[2]<<num[3]<<sig[3]<<num[4]<<'=';
+			ocout<<num[1]<<sig[1]<<num[2]<<sig[2]<<num[3]<<sig[3]<<num[4]<<'='<<endl;
+			break;					//1+2+3+4=
+		}
+		case 1:
+		{
+			cout<<'('<<num[1]<<sig[1]<<num[2]<<')'<<sig[2]<<num[3]<<sig[3]<<num[4]<<'=';
+			ocout<<'('<<num[1]<<sig[1]<<num[2]<<')'<<sig[2]<<num[3]<<sig[3]<<num[4]<<'='<<endl;
+			break;		//(1+2)+3+4=
+		}
+		case 2:{
+			cout<<num[1]<<sig[1]<<num[2]<<sig[2]<<'('<<num[3]<<sig[3]<<num[4]<<')'<<'=';
+			ocout<<num[1]<<sig[1]<<num[2]<<sig[2]<<'('<<num[3]<<sig[3]<<num[4]<<')'<<'='<<endl;
+			break;		//1+2+(3+4)=
+		}
+		case 3:
+		{
+			cout<<num[1]<<sig[1]<<'('<<num[2]<<sig[2]<<num[3]<<')'<<sig[3]<<num[4]<<'=';
+			ocout<<num[1]<<sig[1]<<'('<<num[2]<<sig[2]<<num[3]<<')'<<sig[3]<<num[4]<<'='<<endl;
+			break;		//1+(2+3)+4=
+		}
+		case 4:
+		{
+			cout<<'('<<num[1]<<sig[1]<<num[2]<<sig[2]<<num[3]<<')'<<sig[3]<<num[4]<<'=';
+			ocout<<'('<<num[1]<<sig[1]<<num[2]<<sig[2]<<num[3]<<')'<<sig[3]<<num[4]<<'='<<endl;
+			break;		//(1+2+3)+4=
+		}
+		case 5:
+		{
+			cout<<num[1]<<sig[1]<<'('<<num[2]<<sig[2]<<num[3]<<sig[3]<<num[4]<<')'<<'=';
+		    ocout<<num[1]<<sig[1]<<'('<<num[2]<<sig[2]<<num[3]<<sig[3]<<num[4]<<')'<<'='<<endl;
+			break;		//1+(2+3+4)=
+		}
 	}
+	ocout.close();
 }
 int calculateResult(int type)      //计算生成的随机式子的结果
 {
@@ -407,14 +442,14 @@ int calculateResult(int type)      //计算生成的随机式子的结果
 }
 
 
-void print(int rig,int wro)                //输出统计结果
+void print(char *fp,int rig,int wro)                //输出统计结果
 { 
 	ofstream ocout;
 	ocout.open(fp, ios::app);
 	ocout<<"正确题数："<<rig<<endl;
 	cout << "正确题数：" << rig << endl;
 	cout<<"错误题数："<<wro<<endl;
-	ocout << "正确题数：" << rig << endl;
+	ocout<<"错误题数："<<wro<<endl;
 	ocout.close();
 }
 
@@ -423,7 +458,7 @@ int main(int argc, char *argv[])          //主函数
 	srand(time(0));
 	int i,type,sum=0,correct=0,rig=0,wro=0;  //type用于控制式子输出类型，correct存储式子正确答案，rig，wro统计正误题数 
 	scan1();
-	sum = readFile(argv[1]);   
+	sum = readFile(argv[1],argv[2]);   
 	for(i=1;i<=sum;)
 	{
 		randomNumber();
@@ -433,7 +468,7 @@ int main(int argc, char *argv[])          //主函数
 		if(flag==0)
 		{
 		
-			generateExpression(type);
+			generateExpression(argv[2],type);
 			if(scan2(argv[2],correct)==1)
 			{
 				rig++;
@@ -453,4 +488,5 @@ int main(int argc, char *argv[])          //主函数
 	print(argv[2],rig,wro);
 	return 0;
 }
+
 
